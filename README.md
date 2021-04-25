@@ -46,18 +46,21 @@ Include in your code and begin using the library:
 CreatePlayerAltChat(playerid)
 ```
 Creating textdraws for player alt chat
+
 Returns 1 if alt chat is created successful, otherwise returns 0 (even if chat is created previously)
 
 ```pawn
 DestroyPlayerAltChat(playerid)
 ```
 Used for destroying alt chat textdraws
+
 Returns 1 if alt chat is destroyed successful, otherwise 0
 
 ```pawn
 TogglePlayerAltChat(playerid, bool: toggle)
 ```
 Toggling player alt chat
+
 Returns 1 if operation is successful, otherwise returns 0
 
 
@@ -65,6 +68,7 @@ Returns 1 if operation is successful, otherwise returns 0
 SendPlayerAltMessage(playerid, message[])
 ```
 Sending player alt chat message
+
 Returns 1 if operation is successful, otherwise returns 0
 
 ```pawn
