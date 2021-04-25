@@ -1,0 +1,9 @@
+{
+	"user": "xunder-matth",
+	"repo": "samp-altchat",
+	"entry": "test.pwn",
+	"output": "test.amx",
+	"dependencies": [
+		"sampctl/samp-stdlib"
+	]
+}
