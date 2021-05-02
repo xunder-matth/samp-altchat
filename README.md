@@ -77,7 +77,7 @@ IsPlayerAltChatCreated(playerid)
 Returns 1 if player alt chat is created (it doesn't have to be shown), otherwise 0
 
 ```pawn
-IsPlayerAltChatShown
+IsPlayerAltChatShown(playerid)
 ```
 Returns 1 if player alt chat is displayed to player, otherwise 0
 
