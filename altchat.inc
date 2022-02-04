@@ -25,23 +25,23 @@ enum e_ALTCHAT_STATES (<<=1) {
 	ALTCHAT_STATE_SHOWN
 };
 
-static PlayerText: AltChat_UI[MAX_PLAYERS][MAX_LINES],
-	AltChat_Text[MAX_PLAYERS][MAX_LINES][MAX_ALT_CHAT_MESSAGE_LEN char],
-	e_ALTCHAT_STATES: gPlayerAltChatState[MAX_PLAYERS] = { ALTCHAT_STATE_NONE, ... };
+static PlayerText: g_sAltChatPTD[MAX_PLAYERS][MAX_LINES],
+	g_sAltChatText[MAX_PLAYERS][MAX_LINES][MAX_ALT_CHAT_MESSAGE_LEN char],
+	e_ALTCHAT_STATES: g_sAltChatState[MAX_PLAYERS] = { ALTCHAT_STATE_NONE, ... };
 
-stock CreatePlayerAltChat(playerid) {
+stock AltChat_CreatePlayer(playerid) {
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 
-	if (IsPlayerAltChatCreated(playerid)) {
+	if (AltChat_IsPlayerCreated(playerid)) {
 		return 0;
 	}
 
 	static const emptyDummyZero[MAX_ALT_CHAT_MESSAGE_LEN char];
 
 	for(new i = 0, PlayerText: textdrawid; i < MAX_LINES; ++ i) {
-		textdrawid = AltChat_UI[playerid][i] = CreatePlayerTextDraw(playerid, 35.599971, 229.573348 + (10.453385 * i), " "); // Empty textdraw string causing SA-MP to crash :/
+		textdrawid = g_sAltChatPTD[playerid][i] = CreatePlayerTextDraw(playerid, 35.599971, 229.573348 + (10.453385 * i), " "); // Empty textdraw string causing SA-MP to crash :/
 		PlayerTextDrawLetterSize(playerid, textdrawid, 0.209600, 1.137066);
 		PlayerTextDrawAlignment(playerid, textdrawid, 1);
 		PlayerTextDrawColor(playerid, textdrawid, -1);
@@ -52,65 +52,65 @@ stock CreatePlayerAltChat(playerid) {
 		PlayerTextDrawSetProportional(playerid, textdrawid, 1);
 		PlayerTextDrawSetShadow(playerid, textdrawid, 0);
 
-		AltChat_Text[playerid][i] = emptyDummyZero; 		
+		g_sAltChatText[playerid][i] = emptyDummyZero; 		
 	}
 
-	gPlayerAltChatState[playerid] = ALTCHAT_STATE_CREATED;
+	g_sAltChatState[playerid] = ALTCHAT_STATE_CREATED;
 	return 1;
 }
 
-stock DestroyPlayerAltChat(playerid) {
+stock AltChat_DestroyPlayer(playerid) {
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 
-	if (!IsPlayerAltChatCreated(playerid)) {
+	if (!AltChat_IsPlayerCreated(playerid)) {
 		return 0;
 	}
 
 	for(new i = 0; i < MAX_LINES; ++ i) {
-		PlayerTextDrawDestroy(playerid, AltChat_UI[playerid][i]);
+		PlayerTextDrawDestroy(playerid, g_sAltChatPTD[playerid][i]);
 
-		AltChat_Text[playerid][i]{0} = EOS;
+		g_sAltChatText[playerid][i]{0} = EOS;
 	}
 
-	gPlayerAltChatState[playerid] = ALTCHAT_STATE_NONE;
+	g_sAltChatState[playerid] = ALTCHAT_STATE_NONE;
 	return 1;
 }
 
-stock TogglePlayerAltChat(playerid, bool: toggle) {
+stock AltChat_TogglePlayer(playerid, bool: toggle) {
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 
-	if (!IsPlayerAltChatCreated(playerid)) {
+	if (!AltChat_IsPlayerCreated(playerid)) {
 		return 0;
 	}
 	
-	new shown = IsPlayerAltChatShown(playerid);
+	new shown = AltChat_IsPlayerShown(playerid);
 
 	if (toggle && !shown) {
 		for(new i = 0; i < MAX_LINES; ++ i) {	
-			PlayerTextDrawShow(playerid, AltChat_UI[playerid][i]);
+			PlayerTextDrawShow(playerid, g_sAltChatPTD[playerid][i]);
 		}
 
-		gPlayerAltChatState[playerid] ^= ALTCHAT_STATE_SHOWN;
+		g_sAltChatState[playerid] ^= ALTCHAT_STATE_SHOWN;
 	} else if (!toggle && shown) {
 		for(new i = 0; i < MAX_LINES; ++ i) {	
-			PlayerTextDrawHide(playerid, AltChat_UI[playerid][i]);
+			PlayerTextDrawHide(playerid, g_sAltChatPTD[playerid][i]);
 		}
 
-		gPlayerAltChatState[playerid] ^= ALTCHAT_STATE_SHOWN;
+		g_sAltChatState[playerid] ^= ALTCHAT_STATE_SHOWN;
 	}
 	return 1;
 }
 
-stock SendPlayerAltMessage(playerid, message[]) {
+stock AltChat_SendPlayer(playerid, message[]) {
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 	
-	if (!IsPlayerAltChatCreated(playerid) || !IsPlayerAltChatShown(playerid)) {
+	if (!AltChat_IsPlayerCreated(playerid) || !AltChat_IsPlayerShown(playerid)) {
 		return 0;
 	}
 
@@ -120,37 +120,37 @@ stock SendPlayerAltMessage(playerid, message[]) {
 
 	for(new i = 0; i < MAX_LINES; i ++) {
 		if (i == MAX_LINES - 1) {
-			strpack(AltChat_Text[playerid][i], message, 128);
+			strpack(g_sAltChatText[playerid][i], message, 128);
 			break;
 		}
 		
-		strpack(AltChat_Text[playerid][i], AltChat_Text[playerid][i + 1], MAX_ALT_CHAT_MESSAGE_LEN);
+		strpack(g_sAltChatText[playerid][i], g_sAltChatText[playerid][i + 1], MAX_ALT_CHAT_MESSAGE_LEN);
 	}
 
 	for(new i = 0; i < MAX_LINES; i ++) {
-		if (AltChat_Text[playerid][i]{0} == EOS) {
-			AltChat_Text[playerid][i]{0} = ' ';
+		if (g_sAltChatText[playerid][i]{0} == EOS) {
+			g_sAltChatText[playerid][i]{0} = ' ';
 		}
 
-		PlayerTextDrawSetString(playerid, AltChat_UI[playerid][i], AltChat_Text[playerid][i]);
+		PlayerTextDrawSetString(playerid, g_sAltChatPTD[playerid][i], g_sAltChatText[playerid][i]);
 	}
 	return 1;
 }
 
-stock IsPlayerAltChatCreated(playerid) {
+stock AltChat_IsPlayerCreated(playerid) {
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 	
-	return (gPlayerAltChatState[playerid] & ALTCHAT_STATE_CREATED);
+	return (g_sAltChatState[playerid] & ALTCHAT_STATE_CREATED);
 }
 
-stock IsPlayerAltChatShown(playerid) {
+stock AltChat_IsPlayerShown(playerid) {
 	if (!IsPlayerConnected(playerid)) {
 		return 0;
 	}
 	
-	return (gPlayerAltChatState[playerid] & ALTCHAT_STATE_SHOWN);
+	return (g_sAltChatState[playerid] & ALTCHAT_STATE_SHOWN);
 }
 
 #if defined _INC_y_hooks
@@ -158,7 +158,7 @@ stock IsPlayerAltChatShown(playerid) {
 #else 
 	public OnPlayerConnect(playerid) {
 #endif
-	gPlayerAltChatState[playerid] = ALTCHAT_STATE_NONE;
+	g_sAltChatState[playerid] = ALTCHAT_STATE_NONE;
 
 	#if !defined _INC_y_hooks
 		#if defined ALTCHAT_OnPlayerConnect
