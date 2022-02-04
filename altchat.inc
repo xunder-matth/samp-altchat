@@ -40,7 +40,7 @@ stock AltChat_CreatePlayer(playerid) {
 
 	static const emptyDummyZero[MAX_ALT_CHAT_MESSAGE_LEN char];
 
-	for(new i = 0, PlayerText: textdrawid; i < MAX_LINES; ++ i) {
+	for(new i = 0, PlayerText: textdrawid; i != MAX_LINES; ++ i) {
 		textdrawid = g_sAltChatPTD[playerid][i] = CreatePlayerTextDraw(playerid, 35.599971, 229.573348 + (10.453385 * i), " "); // Empty textdraw string causing SA-MP to crash :/
 		PlayerTextDrawLetterSize(playerid, textdrawid, 0.209600, 1.137066);
 		PlayerTextDrawAlignment(playerid, textdrawid, 1);
@@ -68,7 +68,7 @@ stock AltChat_DestroyPlayer(playerid) {
 		return 0;
 	}
 
-	for(new i = 0; i < MAX_LINES; ++ i) {
+	for(new i = 0; i != MAX_LINES; ++ i) {
 		PlayerTextDrawDestroy(playerid, g_sAltChatPTD[playerid][i]);
 
 		g_sAltChatText[playerid][i]{0} = EOS;
@@ -90,13 +90,13 @@ stock AltChat_TogglePlayer(playerid, bool: toggle) {
 	new shown = AltChat_IsPlayerShown(playerid);
 
 	if (toggle && !shown) {
-		for(new i = 0; i < MAX_LINES; ++ i) {	
+		for(new i = 0; i != MAX_LINES; ++ i) {	
 			PlayerTextDrawShow(playerid, g_sAltChatPTD[playerid][i]);
 		}
 
 		g_sAltChatState[playerid] ^= ALTCHAT_STATE_SHOWN;
 	} else if (!toggle && shown) {
-		for(new i = 0; i < MAX_LINES; ++ i) {	
+		for(new i = 0; i != MAX_LINES; ++ i) {	
 			PlayerTextDrawHide(playerid, g_sAltChatPTD[playerid][i]);
 		}
 
@@ -118,7 +118,7 @@ stock AltChat_SendPlayer(playerid, message[]) {
 		message[0] = ' ';
 	}
 
-	for(new i = 0; i < MAX_LINES; i ++) {
+	for(new i = 0; i != MAX_LINES; i ++) {
 		if (i == MAX_LINES - 1) {
 			strpack(g_sAltChatText[playerid][i], message, 128);
 			break;
@@ -127,7 +127,7 @@ stock AltChat_SendPlayer(playerid, message[]) {
 		strpack(g_sAltChatText[playerid][i], g_sAltChatText[playerid][i + 1], MAX_ALT_CHAT_MESSAGE_LEN);
 	}
 
-	for(new i = 0; i < MAX_LINES; i ++) {
+	for(new i = 0; i != MAX_LINES; i ++) {
 		if (g_sAltChatText[playerid][i]{0} == EOS) {
 			g_sAltChatText[playerid][i]{0} = ' ';
 		}
