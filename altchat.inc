@@ -12,6 +12,8 @@
 	#define MAX_LINES							(10)			// Number of alt. chat lines (default: 10)
 #endif
 
+#define MAX_ALT_CHAT_MESSAGE_LEN				(128)
+
 #if !defined isnull
 	#define isnull(%0) \
 		((!(%0[0])) || (((%0[0]) == '\1') && (!(%0[1]))))
@@ -24,7 +26,7 @@ enum e_ALTCHAT_STATES (<<=1) {
 };
 
 static PlayerText: AltChat_UI[MAX_PLAYERS][MAX_LINES],
-	AltChat_Text[MAX_PLAYERS][MAX_LINES][128],
+	AltChat_Text[MAX_PLAYERS][MAX_LINES][MAX_ALT_CHAT_MESSAGE_LEN char],
 	e_ALTCHAT_STATES: gPlayerAltChatState[MAX_PLAYERS] = { ALTCHAT_STATE_NONE, ... };
 
 stock CreatePlayerAltChat(playerid) {
@@ -36,11 +38,10 @@ stock CreatePlayerAltChat(playerid) {
 		return 0;
 	}
 
- 	new PlayerText: textdrawid,
- 		Float: position_y = 229.573348;
+	static const emptyDummyZero[MAX_ALT_CHAT_MESSAGE_LEN char];
 
-	for(new i = 0; i < MAX_LINES; ++ i) {
-		textdrawid = AltChat_UI[playerid][i] = CreatePlayerTextDraw(playerid, 35.599971, position_y, " "); // Empty textdraw string causing SA-MP to crash :/
+	for(new i = 0, PlayerText: textdrawid; i < MAX_LINES; ++ i) {
+		textdrawid = AltChat_UI[playerid][i] = CreatePlayerTextDraw(playerid, 35.599971, 229.573348 + (10.453385 * i), " "); // Empty textdraw string causing SA-MP to crash :/
 		PlayerTextDrawLetterSize(playerid, textdrawid, 0.209600, 1.137066);
 		PlayerTextDrawAlignment(playerid, textdrawid, 1);
 		PlayerTextDrawColor(playerid, textdrawid, -1);
@@ -51,9 +52,7 @@ stock CreatePlayerAltChat(playerid) {
 		PlayerTextDrawSetProportional(playerid, textdrawid, 1);
 		PlayerTextDrawSetShadow(playerid, textdrawid, 0);
 
-		AltChat_Text[playerid][i][0] = EOS;
- 		
-		position_y += (240.026733 - 229.573348); // This is spacing between two lines
+		AltChat_Text[playerid][i] = emptyDummyZero; 		
 	}
 
 	gPlayerAltChatState[playerid] = ALTCHAT_STATE_CREATED;
@@ -72,8 +71,7 @@ stock DestroyPlayerAltChat(playerid) {
 	for(new i = 0; i < MAX_LINES; ++ i) {
 		PlayerTextDrawDestroy(playerid, AltChat_UI[playerid][i]);
 
-		AltChat_Text[playerid][i][0] = EOS;
-		strmid(AltChat_Text[playerid][i], " ", 0, 2, 2);
+		AltChat_Text[playerid][i]{0} = EOS;
 	}
 
 	gPlayerAltChatState[playerid] = ALTCHAT_STATE_NONE;
@@ -122,15 +120,16 @@ stock SendPlayerAltMessage(playerid, message[]) {
 
 	for(new i = 0; i < MAX_LINES; i ++) {
 		if (i == MAX_LINES - 1) {
-			strmid(AltChat_Text[playerid][i], message, 0, 128, 128);
+			strpack(AltChat_Text[playerid][i], message, 128);
 			break;
 		}
-		strmid(AltChat_Text[playerid][i], AltChat_Text[playerid][i + 1], 0, 128, 128);
+		
+		strpack(AltChat_Text[playerid][i], AltChat_Text[playerid][i + 1], MAX_ALT_CHAT_MESSAGE_LEN);
 	}
 
-	for (new i = 0; i < MAX_LINES; i ++) {
-		if (AltChat_Text[playerid][i][0] == EOS) {
-			AltChat_Text[playerid][i][0] = ' ';
+	for(new i = 0; i < MAX_LINES; i ++) {
+		if (AltChat_Text[playerid][i]{0} == EOS) {
+			AltChat_Text[playerid][i]{0} = ' ';
 		}
 
 		PlayerTextDrawSetString(playerid, AltChat_UI[playerid][i], AltChat_Text[playerid][i]);
@@ -159,10 +158,6 @@ stock IsPlayerAltChatShown(playerid) {
 #else 
 	public OnPlayerConnect(playerid) {
 #endif
-	for(new i = 0; i < MAX_LINES; ++ i) {
-		AltChat_Text[playerid][i][0] = EOS;
-	}
-
 	gPlayerAltChatState[playerid] = ALTCHAT_STATE_NONE;
 
 	#if !defined _INC_y_hooks
