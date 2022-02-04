@@ -5,6 +5,12 @@ main() {
 	
 }
 
+public OnPlayerConnect(playerid) {
+	SetSpawnInfo(playerid, 0, 0, 0.0, 0.0, 5.0, 0.0, 0, 0, 0, 0, 0, 0);
+	SpawnPlayer(playerid);
+	return 1;
+}
+
 public OnPlayerCommandText(playerid, cmdtext[]) {
 	if (!strcmp(cmdtext, "/state", true)) {
 		new buffer[128];
