@@ -124,7 +124,7 @@ stock AltChat_SendPlayer(playerid, message[]) {
 			break;
 		}
 		
-		strpack(g_sAltChatText[playerid][i], g_sAltChatText[playerid][i + 1], MAX_ALT_CHAT_MESSAGE_LEN);
+		strpack(g_sAltChatText[playerid][i], g_sAltChatText[playerid][i + 1], MAX_ALT_CHAT_MESSAGE_LEN char);
 	}
 
 	for(new i = 0; i != MAX_LINES; i ++) {
