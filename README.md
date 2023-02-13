@@ -7,7 +7,7 @@
 Simply install to your project:
 
 ```bash
-sampctl package install xunder-matth/samp-altchat
+sampctl package install xunder-matth/samp-altchat@v2
 ```
 
 Include in your code and begin using the library:
